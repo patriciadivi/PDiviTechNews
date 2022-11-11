@@ -7,9 +7,7 @@ from parsel import Selector
 def fetch(url: str, wait: int = 1):
     try:
         response = requests.get(
-            url,
-            timeout=wait,
-            headers={"user-agent": "Fake user-agent"}
+            url, timeout=wait, headers={"user-agent": "Fake user-agent"}
         )
         response.raise_for_status()
         time.sleep(1)
@@ -32,7 +30,16 @@ def scrape_novidades(html_content):
 
 # Requisito 3
 def scrape_next_page_link(html_content):
-    """Seu código deve vir aqui"""
+    getSelector = Selector(html_content)
+
+    nextPage = getSelector.css(
+        ".nav-links > a.next.page-numbers::attr(href)"
+    ).get()
+
+    if not nextPage:
+        return None
+    else:
+        return nextPage
 
 
 # Requisito 4
