@@ -33,9 +33,29 @@ def search_by_date(dateParams):
 
 # Requisito 8
 def search_by_tag(tag):
-    """Seu código deve vir aqui"""
+    newNews = search_news(
+        {
+            # "$elemMatch": "i" = Busca expecificada, estilo um find do JS
+            "tags": {
+                        "$elemMatch": {"$regex": tag, "$options": "i"}
+                    }
+        }
+    )
+    resultNews = list()
+    for each_line in newNews:
+        resultNews.append((each_line["title"], each_line["url"]))
+    return resultNews
 
 
 # Requisito 9
 def search_by_category(category):
-    """Seu código deve vir aqui"""
+    newNews = search_news(
+        {
+            # "$options": "i" = Procura por maiúsculas e minúsculas
+            "category": {"$regex": category, "$options": "i"},
+        }
+    )
+    resultNews = list()
+    for each_line in newNews:
+        resultNews.append((each_line["title"], each_line["url"]))
+    return resultNews
