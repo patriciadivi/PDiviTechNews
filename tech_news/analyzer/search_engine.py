@@ -49,12 +49,7 @@ def search_by_tag(tag):
 
 # Requisito 9
 def search_by_category(category):
-    newNews = search_news(
-        {
-            # "$options": "i" = Procura por maiúsculas e minúsculas
-            "category": {"$regex": category, "$options": "i"},
-        }
-    )
+    newNews = search_news({"category": {"$regex": category, "$options": "i"}})
     resultNews = list()
     for each_line in newNews:
         resultNews.append((each_line["title"], each_line["url"]))
