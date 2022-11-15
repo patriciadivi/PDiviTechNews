@@ -1,5 +1,6 @@
-import requests
 import time
+import requests
+from tech_news.database import create_news
 from parsel import Selector
 
 
@@ -49,19 +50,17 @@ def scrape_noticia(html_content):
     resultComments = getSelector.css(".comment-list li").getall()
 
     return {
-        "url": getSelector.css(
-            "link[rel=canonical]::attr(href)"
-        ).get(),
-        "title": getSelector.css(
-            ".entry-header-inner > h1.entry-title::text"
-        ).get().strip(),
-        "timestamp": getSelector.css(
-            ".post-meta li.meta-date::text"
-        ).get(),
+        "url": getSelector.css("link[rel=canonical]::attr(href)").get(),
+        "title": getSelector.css(".entry-header-inner > h1.entry-title::text")
+        .get()
+        .strip(),
+        "timestamp": getSelector.css(".post-meta li.meta-date::text").get(),
         "writer": getSelector.css("span.author > a::text").get(),
         "comments_count": len(resultComments) if resultComments else 0,
-        "summary": "".join(getSelector.css(
-            ".entry-content > p:first-of-type *::text").getall()
+        "summary": "".join(
+            getSelector.css(
+                ".entry-content > p:first-of-type *::text"
+            ).getall()
         ).strip(),
         "tags": getSelector.css("section.post-tags a[rel=tag]::text").getall(),
         "category": getSelector.css(
@@ -72,4 +71,18 @@ def scrape_noticia(html_content):
 
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    urlBase = "https://blog.betrybe.com/"
+    linksNews = []
+
+    while amount > len(linksNews):
+        linksNewNews = scrape_novidades(fetch(urlBase))
+        linksNews.extend(linksNewNews)
+        urlBase = scrape_next_page_link(fetch(urlBase))
+
+    linksNewsNow = linksNews[:amount]
+    news = [
+        scrape_noticia(fetch(newsNow)) for newsNow in linksNewsNow
+    ]
+
+    create_news(news)
+    return news
